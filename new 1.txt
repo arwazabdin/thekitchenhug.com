@@ -1,0 +1,510 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>The Kitchen Hug - Order Online</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap');
+        body { font-family: 'Poppins', sans-serif; }
+        .cart-item { animation: slideIn 0.3s ease-out; }
+        @keyframes slideIn {
+            from { opacity: 0; transform: translateX(20px); }
+            to { opacity: 1; transform: translateX(0); }
+        }
+        .order-success { animation: fadeIn 0.5s ease-out; }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: scale(0.9); }
+            to { opacity: 1; transform: scale(1); }
+        }
+    </style>
+</head>
+<body class="bg-gradient-to-br from-orange-50 to-red-50 min-h-screen">
+    <!-- Header -->
+    <header class="bg-white shadow-lg sticky top-0 z-50">
+        <div class="container mx-auto px-4 py-4">
+            <div class="flex justify-between items-center">
+                <div class="flex items-center space-x-3">
+                    <div class="text-3xl">🤗</div>
+                    <h1 class="text-2xl font-bold text-gray-800">The Kitchen Hug</h1>
+                </div>
+                <div class="flex items-center space-x-3">
+                    <button id="adminBtn" class="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-lg flex items-center space-x-2 transition-colors">
+                        <span>⚙️</span>
+                        <span>Edit Menu</span>
+                    </button>
+                    <button id="cartBtn" class="bg-orange-500 hover:bg-orange-600 text-white px-4 py-2 rounded-lg flex items-center space-x-2 transition-colors">
+                        <span>🛒</span>
+                        <span>Cart (<span id="cartCount">0</span>)</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Hero Section -->
+    <section class="bg-gradient-to-r from-orange-400 to-red-400 text-white py-16">
+        <div class="container mx-auto px-4 text-center">
+            <h2 class="text-4xl font-bold mb-4">Delicious Food, Delivered with Love</h2>
+            <p class="text-xl mb-8">Experience the warmth of home-cooked meals</p>
+            <div class="bg-white bg-opacity-20 rounded-lg p-4 mb-8 inline-block">
+                <p class="text-lg font-semibold mb-2">📞 Call or Text to Order:</p>
+                <p class="text-2xl font-bold">(555) 123-FOOD</p>
+            </div>
+            <button onclick="document.getElementById('menu').scrollIntoView({behavior: 'smooth'})" class="bg-white text-orange-500 px-8 py-3 rounded-full font-semibold hover:bg-gray-100 transition-colors">
+                Browse Menu
+            </button>
+        </div>
+    </section>
+
+    <!-- Menu Section -->
+    <section id="menu" class="py-16">
+        <div class="container mx-auto px-4">
+            <h2 class="text-3xl font-bold text-center mb-12 text-gray-800">Our Menu</h2>
+            
+            <!-- Menu Categories -->
+            <div class="flex flex-wrap justify-center mb-8 space-x-2 space-y-2">
+                <button class="category-btn bg-orange-500 text-white px-6 py-2 rounded-full" data-category="all">All Items</button>
+                <button class="category-btn bg-gray-200 text-gray-700 px-6 py-2 rounded-full hover:bg-gray-300" data-category="appetizers">Appetizers</button>
+                <button class="category-btn bg-gray-200 text-gray-700 px-6 py-2 rounded-full hover:bg-gray-300" data-category="mains">Main Courses</button>
+                <button class="category-btn bg-gray-200 text-gray-700 px-6 py-2 rounded-full hover:bg-gray-300" data-category="desserts">Desserts</button>
+                <button class="category-btn bg-gray-200 text-gray-700 px-6 py-2 rounded-full hover:bg-gray-300" data-category="beverages">Beverages</button>
+            </div>
+
+            <!-- Menu Items Grid -->
+            <div id="menuGrid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                <!-- Menu items will be populated by JavaScript -->
+            </div>
+        </div>
+    </section>
+
+    <!-- Cart Modal -->
+    <div id="cartModal" class="fixed inset-0 bg-black bg-opacity-50 hidden z-50">
+        <div class="flex items-center justify-center min-h-screen p-4">
+            <div class="bg-white rounded-lg max-w-md w-full max-h-96 overflow-y-auto">
+                <div class="p-6">
+                    <div class="flex justify-between items-center mb-4">
+                        <h3 class="text-xl font-bold">Your Order</h3>
+                        <button id="closeCart" class="text-gray-500 hover:text-gray-700 text-2xl">&times;</button>
+                    </div>
+                    <div id="cartItems" class="space-y-3 mb-4">
+                        <!-- Cart items will be populated here -->
+                    </div>
+                    <div class="border-t pt-4">
+                        <div class="flex justify-between items-center mb-4">
+                            <span class="font-bold text-lg">Total: $<span id="cartTotal">0.00</span></span>
+                        </div>
+                        <div class="space-y-3">
+                            <button id="callOrderBtn" class="w-full bg-green-500 hover:bg-green-600 text-white py-3 rounded-lg font-semibold transition-colors flex items-center justify-center space-x-2">
+                                <span>📞</span>
+                                <span>Call to Order: (555) 123-FOOD</span>
+                            </button>
+                            <button id="smsOrderBtn" class="w-full bg-blue-500 hover:bg-blue-600 text-white py-3 rounded-lg font-semibold transition-colors flex items-center justify-center space-x-2">
+                                <span>💬</span>
+                                <span>Text Your Order</span>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Admin Menu Editor Modal -->
+    <div id="adminModal" class="fixed inset-0 bg-black bg-opacity-50 hidden z-50">
+        <div class="flex items-center justify-center min-h-screen p-4">
+            <div class="bg-white rounded-lg max-w-4xl w-full max-h-96 overflow-y-auto">
+                <div class="p-6">
+                    <div class="flex justify-between items-center mb-6">
+                        <h3 class="text-2xl font-bold">Menu Editor</h3>
+                        <button id="closeAdmin" class="text-gray-500 hover:text-gray-700 text-2xl">&times;</button>
+                    </div>
+                    
+                    <!-- Add New Item Form -->
+                    <div class="bg-gray-50 p-4 rounded-lg mb-6">
+                        <h4 class="font-semibold mb-4">Add New Menu Item</h4>
+                        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                            <input type="text" id="newItemName" placeholder="Item Name" class="border rounded-lg px-3 py-2">
+                            <select id="newItemCategory" class="border rounded-lg px-3 py-2">
+                                <option value="appetizers">Appetizers</option>
+                                <option value="mains">Main Courses</option>
+                                <option value="desserts">Desserts</option>
+                                <option value="beverages">Beverages</option>
+                            </select>
+                            <input type="number" id="newItemPrice" placeholder="Price" step="0.01" class="border rounded-lg px-3 py-2">
+                            <input type="text" id="newItemEmoji" placeholder="Emoji (🍕)" class="border rounded-lg px-3 py-2">
+                            <input type="text" id="newItemDescription" placeholder="Description" class="border rounded-lg px-3 py-2 md:col-span-2">
+                        </div>
+                        <button id="addItemBtn" class="mt-4 bg-green-500 hover:bg-green-600 text-white px-6 py-2 rounded-lg">Add Item</button>
+                    </div>
+                    
+                    <!-- Existing Items -->
+                    <div>
+                        <h4 class="font-semibold mb-4">Current Menu Items</h4>
+                        <div id="adminMenuList" class="space-y-3 max-h-64 overflow-y-auto">
+                            <!-- Admin menu items will be populated here -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Order Success Modal -->
+    <div id="successModal" class="fixed inset-0 bg-black bg-opacity-50 hidden z-50">
+        <div class="flex items-center justify-center min-h-screen p-4">
+            <div class="bg-white rounded-lg max-w-md w-full p-8 text-center order-success">
+                <div class="text-6xl mb-4">🎉</div>
+                <h3 class="text-2xl font-bold mb-4 text-green-600">Order Placed Successfully!</h3>
+                <p class="text-gray-600 mb-6">Thank you for choosing The Kitchen Hug! Your delicious meal will be prepared with love and delivered soon.</p>
+                <p class="text-sm text-gray-500 mb-6">Order #<span id="orderNumber"></span></p>
+                <button id="closeSuccess" class="bg-orange-500 hover:bg-orange-600 text-white px-8 py-3 rounded-lg font-semibold transition-colors">
+                    Continue Browsing
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="bg-gray-800 text-white py-8">
+        <div class="container mx-auto px-4 text-center">
+            <div class="mb-4">
+                <h3 class="text-xl font-bold mb-2">The Kitchen Hug</h3>
+                <p class="text-gray-300">Serving love, one meal at a time</p>
+            </div>
+            <div class="text-sm text-gray-400">
+                <p>📍 123 Food Street, Flavor Town</p>
+                <p>📞 (555) 123-FOOD | 📧 hello@kitchenhug.com</p>
+                <p class="mt-4">&copy; 2024 The Kitchen Hug. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        // Menu data - Load from localStorage or use defaults
+        let menuItems = JSON.parse(localStorage.getItem('kitchenHugMenu')) || [
+            // Appetizers
+            { id: 1, name: "Crispy Spring Rolls", category: "appetizers", price: 8.99, description: "Fresh vegetables wrapped in crispy pastry", emoji: "🥢" },
+            { id: 2, name: "Loaded Nachos", category: "appetizers", price: 12.99, description: "Tortilla chips with cheese, jalapeños, and sour cream", emoji: "🧀" },
+            { id: 3, name: "Buffalo Wings", category: "appetizers", price: 11.99, description: "Spicy chicken wings with ranch dip", emoji: "🍗" },
+            
+            // Main Courses
+            { id: 4, name: "Grilled Salmon", category: "mains", price: 24.99, description: "Fresh Atlantic salmon with lemon herbs", emoji: "🐟" },
+            { id: 5, name: "Beef Burger Deluxe", category: "mains", price: 16.99, description: "Juicy beef patty with all the fixings", emoji: "🍔" },
+            { id: 6, name: "Chicken Alfredo", category: "mains", price: 18.99, description: "Creamy pasta with grilled chicken", emoji: "🍝" },
+            { id: 7, name: "Vegetarian Pizza", category: "mains", price: 15.99, description: "Fresh vegetables on crispy crust", emoji: "🍕" },
+            
+            // Desserts
+            { id: 8, name: "Chocolate Cake", category: "desserts", price: 7.99, description: "Rich chocolate cake with ganache", emoji: "🍰" },
+            { id: 9, name: "Ice Cream Sundae", category: "desserts", price: 6.99, description: "Vanilla ice cream with toppings", emoji: "🍨" },
+            
+            // Beverages
+            { id: 10, name: "Fresh Lemonade", category: "beverages", price: 4.99, description: "Freshly squeezed lemon juice", emoji: "🍋" },
+            { id: 11, name: "Coffee", category: "beverages", price: 3.99, description: "Freshly brewed coffee", emoji: "☕" },
+            { id: 12, name: "Smoothie Bowl", category: "beverages", price: 8.99, description: "Mixed berry smoothie with toppings", emoji: "🥤" }
+        ];
+
+        // Save menu to localStorage
+        function saveMenu() {
+            localStorage.setItem('kitchenHugMenu', JSON.stringify(menuItems));
+        }
+
+        let cart = [];
+        let currentCategory = 'all';
+
+        // DOM elements
+        const menuGrid = document.getElementById('menuGrid');
+        const cartBtn = document.getElementById('cartBtn');
+        const cartModal = document.getElementById('cartModal');
+        const cartItems = document.getElementById('cartItems');
+        const cartCount = document.getElementById('cartCount');
+        const cartTotal = document.getElementById('cartTotal');
+        const closeCart = document.getElementById('closeCart');
+        const checkoutBtn = document.getElementById('checkoutBtn');
+        const successModal = document.getElementById('successModal');
+        const closeSuccess = document.getElementById('closeSuccess');
+        const orderNumber = document.getElementById('orderNumber');
+        const adminBtn = document.getElementById('adminBtn');
+        const adminModal = document.getElementById('adminModal');
+        const closeAdmin = document.getElementById('closeAdmin');
+        const adminMenuList = document.getElementById('adminMenuList');
+        const addItemBtn = document.getElementById('addItemBtn');
+
+        // Render menu items
+        function renderMenu(category = 'all') {
+            const filteredItems = category === 'all' ? menuItems : menuItems.filter(item => item.category === category);
+            
+            menuGrid.innerHTML = filteredItems.map(item => `
+                <div class="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-shadow">
+                    <div class="p-6">
+                        <div class="text-4xl mb-3 text-center">${item.emoji}</div>
+                        <h3 class="text-xl font-semibold mb-2">${item.name}</h3>
+                        <p class="text-gray-600 mb-4">${item.description}</p>
+                        <div class="flex justify-between items-center">
+                            <span class="text-2xl font-bold text-orange-500">$${item.price}</span>
+                            <button onclick="addToCart(${item.id})" class="bg-orange-500 hover:bg-orange-600 text-white px-4 py-2 rounded-lg transition-colors">
+                                Add to Cart
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        // Category filtering
+        document.querySelectorAll('.category-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                document.querySelectorAll('.category-btn').forEach(b => {
+                    b.classList.remove('bg-orange-500', 'text-white');
+                    b.classList.add('bg-gray-200', 'text-gray-700');
+                });
+                btn.classList.remove('bg-gray-200', 'text-gray-700');
+                btn.classList.add('bg-orange-500', 'text-white');
+                
+                const category = btn.dataset.category;
+                renderMenu(category);
+            });
+        });
+
+        // Add to cart
+        function addToCart(itemId) {
+            const item = menuItems.find(i => i.id === itemId);
+            const existingItem = cart.find(i => i.id === itemId);
+            
+            if (existingItem) {
+                existingItem.quantity += 1;
+            } else {
+                cart.push({ ...item, quantity: 1 });
+            }
+            
+            updateCartDisplay();
+        }
+
+        // Remove from cart
+        function removeFromCart(itemId) {
+            cart = cart.filter(item => item.id !== itemId);
+            updateCartDisplay();
+        }
+
+        // Update quantity
+        function updateQuantity(itemId, change) {
+            const item = cart.find(i => i.id === itemId);
+            if (item) {
+                item.quantity += change;
+                if (item.quantity <= 0) {
+                    removeFromCart(itemId);
+                } else {
+                    updateCartDisplay();
+                }
+            }
+        }
+
+        // Update cart display
+        function updateCartDisplay() {
+            const totalItems = cart.reduce((sum, item) => sum + item.quantity, 0);
+            const totalPrice = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+            
+            cartCount.textContent = totalItems;
+            cartTotal.textContent = totalPrice.toFixed(2);
+            
+            cartItems.innerHTML = cart.length === 0 ? 
+                '<p class="text-gray-500 text-center py-4">Your cart is empty</p>' :
+                cart.map(item => `
+                    <div class="cart-item flex justify-between items-center bg-gray-50 p-3 rounded-lg">
+                        <div class="flex-1">
+                            <h4 class="font-semibold">${item.name}</h4>
+                            <p class="text-sm text-gray-600">$${item.price} each</p>
+                        </div>
+                        <div class="flex items-center space-x-2">
+                            <button onclick="updateQuantity(${item.id}, -1)" class="bg-gray-200 hover:bg-gray-300 w-8 h-8 rounded-full flex items-center justify-center">-</button>
+                            <span class="w-8 text-center">${item.quantity}</span>
+                            <button onclick="updateQuantity(${item.id}, 1)" class="bg-gray-200 hover:bg-gray-300 w-8 h-8 rounded-full flex items-center justify-center">+</button>
+                            <button onclick="removeFromCart(${item.id})" class="text-red-500 hover:text-red-700 ml-2">🗑️</button>
+                        </div>
+                    </div>
+                `).join('');
+        }
+
+        // Admin functions
+        function renderAdminMenu() {
+            adminMenuList.innerHTML = menuItems.map(item => `
+                <div class="flex justify-between items-center bg-white p-4 rounded-lg border">
+                    <div class="flex items-center space-x-4">
+                        <span class="text-2xl">${item.emoji}</span>
+                        <div>
+                            <h5 class="font-semibold">${item.name}</h5>
+                            <p class="text-sm text-gray-600">${item.description}</p>
+                            <p class="text-sm text-gray-500">Category: ${item.category} | Price: $${item.price}</p>
+                        </div>
+                    </div>
+                    <div class="flex items-center space-x-2">
+                        <button onclick="editMenuItem(${item.id})" class="bg-blue-500 hover:bg-blue-600 text-white px-3 py-1 rounded text-sm">Edit</button>
+                        <button onclick="deleteMenuItem(${item.id})" class="bg-red-500 hover:bg-red-600 text-white px-3 py-1 rounded text-sm">Delete</button>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function addMenuItem() {
+            const name = document.getElementById('newItemName').value;
+            const category = document.getElementById('newItemCategory').value;
+            const price = parseFloat(document.getElementById('newItemPrice').value);
+            const emoji = document.getElementById('newItemEmoji').value;
+            const description = document.getElementById('newItemDescription').value;
+
+            if (!name || !price || !emoji || !description) {
+                alert('Please fill in all fields');
+                return;
+            }
+
+            const newId = Math.max(...menuItems.map(item => item.id)) + 1;
+            const newItem = { id: newId, name, category, price, emoji, description };
+            
+            menuItems.push(newItem);
+            saveMenu();
+            renderMenu(currentCategory);
+            renderAdminMenu();
+            
+            // Clear form
+            document.getElementById('newItemName').value = '';
+            document.getElementById('newItemPrice').value = '';
+            document.getElementById('newItemEmoji').value = '';
+            document.getElementById('newItemDescription').value = '';
+        }
+
+        function deleteMenuItem(id) {
+            if (confirm('Are you sure you want to delete this item?')) {
+                menuItems = menuItems.filter(item => item.id !== id);
+                saveMenu();
+                renderMenu(currentCategory);
+                renderAdminMenu();
+                
+                // Remove from cart if exists
+                cart = cart.filter(item => item.id !== id);
+                updateCartDisplay();
+            }
+        }
+
+        function editMenuItem(id) {
+            const item = menuItems.find(i => i.id === id);
+            if (!item) return;
+
+            const newName = prompt('Enter new name:', item.name);
+            if (newName === null) return;
+
+            const newPrice = prompt('Enter new price:', item.price);
+            if (newPrice === null) return;
+
+            const newDescription = prompt('Enter new description:', item.description);
+            if (newDescription === null) return;
+
+            const newEmoji = prompt('Enter new emoji:', item.emoji);
+            if (newEmoji === null) return;
+
+            item.name = newName || item.name;
+            item.price = parseFloat(newPrice) || item.price;
+            item.description = newDescription || item.description;
+            item.emoji = newEmoji || item.emoji;
+
+            saveMenu();
+            renderMenu(currentCategory);
+            renderAdminMenu();
+        }
+
+        // Modal controls
+        cartBtn.addEventListener('click', () => {
+            cartModal.classList.remove('hidden');
+        });
+
+        closeCart.addEventListener('click', () => {
+            cartModal.classList.add('hidden');
+        });
+
+        closeSuccess.addEventListener('click', () => {
+            successModal.classList.add('hidden');
+        });
+
+        // Admin modal controls
+        adminBtn.addEventListener('click', () => {
+            adminModal.classList.remove('hidden');
+            renderAdminMenu();
+        });
+
+        closeAdmin.addEventListener('click', () => {
+            adminModal.classList.add('hidden');
+        });
+
+        addItemBtn.addEventListener('click', addMenuItem);
+
+        // Phone ordering functions
+        function generateOrderText() {
+            if (cart.length === 0) return '';
+            
+            let orderText = "Hi! I'd like to place an order from The Kitchen Hug:\n\n";
+            
+            cart.forEach(item => {
+                orderText += `${item.quantity}x ${item.name} - $${(item.price * item.quantity).toFixed(2)}\n`;
+            });
+            
+            const total = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+            orderText += `\nTotal: $${total.toFixed(2)}\n\nPlease let me know the delivery time and address confirmation. Thank you!`;
+            
+            return orderText;
+        }
+
+        // Call ordering
+        document.getElementById('callOrderBtn').addEventListener('click', () => {
+            if (cart.length === 0) {
+                alert('Your cart is empty! Please add items before calling.');
+                return;
+            }
+            
+            // Copy order details to clipboard for reference
+            const orderText = generateOrderText();
+            navigator.clipboard.writeText(orderText).then(() => {
+                alert('Order details copied to clipboard! Now calling restaurant...');
+                window.location.href = 'tel:+15551234663';
+            }).catch(() => {
+                alert('Calling restaurant now! Your order details are ready to read.');
+                window.location.href = 'tel:+15551234663';
+            });
+        });
+
+        // SMS ordering
+        document.getElementById('smsOrderBtn').addEventListener('click', () => {
+            if (cart.length === 0) {
+                alert('Your cart is empty! Please add items before texting.');
+                return;
+            }
+            
+            const orderText = generateOrderText();
+            const encodedText = encodeURIComponent(orderText);
+            window.location.href = `sms:+15551234663?body=${encodedText}`;
+        });
+
+        // Close modals when clicking outside
+        cartModal.addEventListener('click', (e) => {
+            if (e.target === cartModal) {
+                cartModal.classList.add('hidden');
+            }
+        });
+
+        successModal.addEventListener('click', (e) => {
+            if (e.target === successModal) {
+                successModal.classList.add('hidden');
+            }
+        });
+
+        adminModal.addEventListener('click', (e) => {
+            if (e.target === adminModal) {
+                adminModal.classList.add('hidden');
+            }
+        });
+
+        // Initialize
+        renderMenu();
+        updateCartDisplay();
+    </script>
+<script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'9653950ab0e45717',t:'MTc1MzUyOTYwNy4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+</html>
